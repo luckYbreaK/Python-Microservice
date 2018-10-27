@@ -1,29 +1,38 @@
-#!flask/bin/python
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response, request
+from flask_pymongo import PyMongo
 
 app = Flask(__name__)
+app.config['MONGO_DBNAME'] = 'meteor'
+app.config['MONGO_URI'] = 'mongodb://127.0.0.1:3001/meteor'
+mongo = PyMongo(app)
 
-tasks = [
-    {
-        'id': 1,
-        'title': u'Buy groceries',
-        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol', 
-        'done': False
-    },
-    {
-        'id': 2,
-        'title': u'Learn Python',
-        'description': u'Need to find a good Python tutorial on the web', 
-        'done': False
-    }
-]
+@app.route('/get/', methods=['GET'])
+def get_data():
+    users = mongo.db.users
+    output = []
+    for user in users.find():
+        output.append({
+        'id' : user['_id'],
+        'createdAt' : user['createdAt'],
+        'services' : user['services'],
+        'username' : user['username'],
+        'emails' : user['emails'],
+        'slug' : user['slug'],
+        'updateAt' : user['updateAt'],
+        'MyProfile' : user['MyProfile'],
+        'teams' : user['teams'],
+        'roles' : user['roles'],
+        'profile' : user['profile']
+        })
+    return jsonify({ 'users' : output })
 
-@app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['GET'])
-def get_task(task_id):
-    task = [task for task in tasks if task['id'] == task_id]
-    if len(task) == 0:
-        abort(404)
-    return jsonify({'task': task[0]})
+@app.route('/get2/', methods=['GET'])
+def get_data2():
+    roles = mongo.db.roles
+    output = []
+    for role in roles.find():
+        output.append({ 'id' : role['_id'], 'name' : role['name'] })
+    return jsonify({ 'roles' : output })
 
 @app.errorhandler(404)
 def not_found(error):
