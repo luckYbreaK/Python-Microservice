@@ -6,7 +6,7 @@ app.config['MONGO_DBNAME'] = 'meteor'
 app.config['MONGO_URI'] = 'mongodb://127.0.0.1:3001/meteor'
 mongo = PyMongo(app)
 
-@app.route('/get/', methods=['GET'])
+@app.route('/getUsers/', methods=['GET'])
 def get_data():
     users = mongo.db.users
     output = []
@@ -26,7 +26,7 @@ def get_data():
         })
     return jsonify({ 'users' : output })
 
-@app.route('/get2/', methods=['GET'])
+@app.route('/getRoles/', methods=['GET'])
 def get_data2():
     roles = mongo.db.roles
     output = []
